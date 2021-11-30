@@ -1,0 +1,291 @@
+<?
+  /**
+  * Copyright (2006). Cody Adams. All rights reserved.
+  *
+  * version: 1.0
+  *
+  * This file can be freely distributed as long as this accompanying header block
+  * is included.
+  *
+  * Please contact Cody at cody@codalli.com for improvements, suggestions, etc.
+  *  
+  * Note: The code snippet used to define complimentary colors was derived from 
+  *       source code found at http://serennu.com/colour/rgbtohsl.php   
+  **/
+  
+  
+  /**
+  *
+  * PHPDump provides 'pretty' markup for dumping args, arrays, objects, etc.
+  *
+  * @param $arg    (required) The evaluated argument
+  * @param $fg     (string: default: ff0 'orange')   :: foreground color
+  * @param $bg     (string: default: 333 'dark gray) :: background color
+  * @param $escape (boolean: default true) :: escapes html entities for display
+  *
+  */
+  DEFINE ('SPACE',' ');
+  
+  function PHPDump($arg,$fg=null,$bg=null,$escape=true)
+  {
+	if(!isset($arg))
+	 $arg = 'undefined';
+	
+    // default the standard colors:
+    if(is_null($fg))
+     $fg = 'ff0';
+
+    if(is_null($bg))
+     $bg = '333';
+
+    $dumpFunction = 'phpdump';
+
+    $standardColors = ($fg=='ff0' && $bg=='333');
+    
+    $yellow = 'ff0';
+    $orange = 'f80';
+    $gray   = '666';
+    $white  = 'fff';
+    $dkgray = '333';
+    $green  = '0f0';
+
+    if(!$standardColors)
+    {
+     $yellow = $fg;
+     $orange = $fg;
+     $gray   = $bg;
+     $white  = $fg;
+     $dkgray = $bg;
+    }
+
+    if($gray == $bg)
+    {
+     // functionality copied from Color.class -> compliment()
+     // originally found at http://serennu.com/colour/rgbtohsl.php
+     
+     $i = (strlen($gray)== 3)?1:2;
+
+     $redhex   = substr($gray,0,$i);
+     $greenhex = substr($gray,$i,$i);
+     $bluehex  = substr($gray,$i+2,$i);
+
+     $var_r = (hexdec($redhex)) / 255;
+     $var_g = (hexdec($greenhex)) / 255;
+     $var_b = (hexdec($bluehex)) / 255;
+
+     $var_min = min($var_r,$var_g,$var_b);
+     $var_max = max($var_r,$var_g,$var_b);
+     $del_max = $var_max - $var_min;
+
+     $l = ($var_max + $var_min) / 2;
+
+     if ($del_max == 0)
+     {
+      $h = 0;
+      $s = 0;
+     }
+     else
+     {
+      if ($l < 0.5)
+       $s = $del_max / ($var_max + $var_min);
+
+      else
+       $s = $del_max / (2 - $var_max - $var_min);
+
+      $del_r = ((($var_max - $var_r) / 6) + ($del_max / 2)) / $del_max;
+      $del_g = ((($var_max - $var_g) / 6) + ($del_max / 2)) / $del_max;
+      $del_b = ((($var_max - $var_b) / 6) + ($del_max / 2)) / $del_max;
+
+      if ($var_r == $var_max)
+       $h = $del_b - $del_g;
+
+      elseif ($var_g == $var_max)
+       $h = (1 / 3) + $del_r - $del_b;
+
+      elseif ($var_b == $var_max)
+       $h = (2 / 3) + $del_g - $del_r;
+
+     
+      if ($h < 0)
+       $h += 1;
+
+      if ($h > 1)
+       $h -= 1;
+     }
+
+     $h2 = $h + 0.5;
+
+     if ($h2 > 1)
+      $h2 -= 1;
+
+     if ($s == 0)
+     {
+      $r = $l * 255;
+      $g = $l * 255;
+      $b = $l * 255;
+     }
+     else
+     {
+      if ($l < 0.5)
+       $var_2 = $l * (1 + $s);
+  
+      else
+       $var_2 = ($l + $s) - ($s * $l);
+  
+      $var_1 = 2 * $l - $var_2;
+      $r = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 + (1 / 3));
+      $g = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2);
+      $b = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 - (1 / 3));
+     };
+
+
+     $rhex = sprintf("%02X",round($r));
+     $ghex = sprintf("%02X",round($g));
+     $bhex = sprintf("%02X",round($b));
+     $rgbhex = $rhex.$ghex.$bhex;
+
+     $gray = $rgbhex;
+    }
+
+    $template = "
+ <div id=\"phpdump\" style=\"color: #{fore};
+      background-color: #{back};
+      text-align: left\"
+      class=\"phpdump-template\"
+      caller=\"{file}: line {line}\">
+  <div style=\"color:#ff0;
+       background-color:#303030;
+       text-decoration:none;
+       padding: 5px\">
+   <span style=\"color:#ff0;
+         background-color:#303030;
+         text-decoration:none;
+         cursor:pointer\"
+         onclick=\"javascript:location='/?d'\">
+    " .$dumpFunction. "( <span style=\"color:#0f0\">{file}</span> : line [ <span style=\"color:#0cf\">{line}</span> ] )
+   </span>
+
+   <!-- div style=\"line-height:1.3em\">stack: <span style=\"color:#fff\">{trak}</span></div -->
+   <!-- div style=\"line-height:1.3em\">trace: <span style=\"color:#fff\">{path}</span></div -->
+   <div>trace stack: <span style=\"color:#fff\">{newtrak}</span></div>   
+  </div>
+  <div style=\"padding:20px; border: 1px dashed #666;margin: 10px\"><pre style=\"font-family:courier new\"><span style=\"color:#" .$orange. "\">{text}</span></pre></div>
+ </div><!-- end phpdump -->\n\n
+";
+
+    $tArg = null;
+
+    if(!is_numeric($arg))
+    {
+     if(is_bool($arg) === true)
+     {
+      $t = ($arg)?'true':'false';
+      $tArg = $t;
+     }
+     else if(is_null($arg))
+     {
+      $tArg = 'null';
+     }
+     else if($arg == '')
+     {
+      $tArg = '{empty string}';
+     }
+     else if($escape)
+     {
+      $arg = htmlentities(print_r($arg,true));
+     }
+    }
+
+    if(!is_null($tArg))
+    {
+     $arg = '(<span style="color:#' .$gray. '">' .$tArg. '</span>)';
+    }
+
+    $trace = array_reverse(debug_backtrace(),true);
+     
+    $index    = (count($trace) > 1 && ($trace[1]['function'] == 'debug' || $trace[1]['function'] == 'pd'))?1:0;
+    $fullPath = str_replace('\\','/',$trace[$index]['file']);
+    $callers  = explode('/',$fullPath);
+    $caller   = end($callers);
+
+    $path   = null;
+    $trak   = null;
+    $delim = '<span style="color:#0f0"> &raquo; </span>';
+
+    $skippedFiles = array();
+    $skippedFiles[] = 'require';
+    $skippedFiles[] = 'phpdump';
+    $skippedFiles[] = 'debug';
+    $skippedFiles[] = 'include';
+
+
+    $newTrak = '<div style="display:inline">';
+
+    foreach($trace as $t => $info)
+    {
+     $function = strToLower($info['function']);
+
+     if(isset($info['file']))
+     {
+      $tempPath = str_replace('\\','/',$info['file']);
+       
+      $paths = explode('/',$tempPath);
+      $file = end($paths);
+       
+       
+      if($t == 0)
+      {
+       $newTrak .= '<span style="color:#e55">'.$function.SPACE.'()</span>';
+      }
+      else
+      {
+       $newTrak .= $file.' [<span style="color:#ee5">~line: ' .$info['line']. '</span>]</div>'."\n\n";
+       
+       if($function == 'dump')
+       {
+        $newTrak .= '<div style="padding-left:68px">&raquo; <span style="color:#e55">function</span> '.get_class($info['object']).'::'.$function.'()'.SPACE;
+        $index = $t;
+        $caller = $file;
+       }
+       else
+       {
+        $newTrak .= '<div style="padding-left:68px">&raquo; ';
+
+        if($t > 1)
+        {
+         $newTrak .= '<span style="color:#55e">'.$function.SPACE.'</span>';
+        }
+       }
+      }
+     }
+
+     if(!in_array($function,$skippedFiles) || ($function == 'debug' && is_null($path)))
+     {
+      $path .= $delim .$function.'()';
+     }
+    }
+
+    $newTrak .= '</div>';
+     
+
+    // colorcode the argument
+    $pattern[0] = '/\[(.*)\]/';
+    $pattern[1] = '/\=\&gt;(.*)/';
+
+    $replace[0] = '[<span style="color:#' .$yellow. '">\\1</span>]';
+    $replace[1] = '=&gt; <span style="color:#' .$orange. '">\\1</span>';
+    $arg = preg_replace($pattern,$replace,$arg);
+
+
+    $dump = str_replace('{fore}',$fg,$template);
+    $dump = str_replace('{back}',$bg,$dump);
+    $dump = str_replace('{text}',$arg,$dump);
+    $dump = str_replace('{file}',$caller,$dump);
+    $dump = str_replace('{path}',$path,$dump);
+    $dump = str_replace('{trak}',$trak,$dump);
+    $dump = str_replace('{newtrak}',$newTrak,$dump);      
+    $dump = str_replace('{line}',$trace[$index]['line'],$dump);
+
+    echo $dump;
+  }
+?>
