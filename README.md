@@ -16,19 +16,21 @@ PHP tools I have created that have helped me in my career
 
 require 'PHPDumpSA.funcion';
 
-// examples
+// examples of 'dumping' an argument:
 
-// dump an argument
+// argument assignments
 $x = 'my value';
-
 phpdump($x); // standard colors
 phpdump($x,'f00','fff'); // red text - white background
 
+// database resources
 $x = mysqi_query('select * from table');
 phpdump($x); // displays information about mysqli resource
 
+// arrays
 $x = [];
 phpdump($x); // displays array elements
 
+// class objects
 $x = new Car();
 phpdump($x); // displays class object properties
