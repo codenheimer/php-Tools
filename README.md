@@ -1,6 +1,7 @@
 # php-tools
 PHP tools I have created that have helped me in my career
 
+```html
  /*
  *
  * PHPDump provides 'pretty' markup for dumping args, arrays, objects, etc.
@@ -11,6 +12,7 @@ PHP tools I have created that have helped me in my career
  * @param $escape (boolean: default true) :: escapes html entities for display
  *
  */
+```
 
 <h2>Usage</h2>
 
