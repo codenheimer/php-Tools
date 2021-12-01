@@ -2,7 +2,7 @@
 # php-tools
 PHP tools I have created that have helped me in my career
 
-<span style="color:#080">
+<p style="color:#080">
  /**
  *
  * PHPDump provides 'pretty' markup for dumping args, arrays, objects, etc.
@@ -13,7 +13,7 @@ PHP tools I have created that have helped me in my career
  * @param $escape (boolean: default true) :: escapes html entities for display
  *
  */
-</span>
+</p>
 
 <h2>Usage</h2>
 
