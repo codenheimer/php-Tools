@@ -34,4 +34,3 @@ phpdump($x); // displays array elements
 // class objects
 $x = new Car();
 phpdump($x); // displays class object properties
-```
