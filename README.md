@@ -16,6 +16,7 @@ PHP tools I have created that have helped me in my career
 
 <h2>Usage</h2>
 
+```html
 require 'PHPDumpSA.funcion';
 
 // examples of 'dumping' an argument:
@@ -36,3 +37,4 @@ phpdump($x); // displays array elements
 // class objects
 $x = new Car();
 phpdump($x); // displays class object properties
+```
