@@ -1,4 +1,5 @@
-<pre>
+```html
+
 # php-tools
 PHP tools I have created that have helped me in my career
 
@@ -37,4 +38,4 @@ phpdump($x); // displays array elements
 // class objects
 $x = new Car();
 phpdump($x); // displays class object properties
-</pre>
+```
