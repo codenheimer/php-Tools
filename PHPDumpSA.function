@@ -24,130 +24,140 @@
   * @param $escape (boolean: default true) :: escapes html entities for display
   *
   */
-  DEFINE ('SPACE',' ');
-  
-  function PHPDump($arg,$fg=null,$bg=null,$escape=true)
+  function PHPDump($arg=null,$fg=null,$bg=null,$escape=true)
   {
-	if(!isset($arg))
-	 $arg = 'undefined';
+   $space = ' ';
+   
+   if(count(func_get_args()) <= 0)
+   {
+    $arg = '{undefined}';
+   }
+   else if(!isset($arg))
+   {
+	$arg = '{null}';
+   }
 	
-    // default the standard colors:
-    if(is_null($fg))
-     $fg = 'ff0';
+   // default the standard colors:
+   if(is_null($fg))
+   {
+    $fg = 'ff0';
+   }
 
-    if(is_null($bg))
-     $bg = '333';
+   if(is_null($bg))
+   {
+    $bg = '333';
+   }
 
-    $dumpFunction = 'phpdump';
+   $dumpFunction = 'phpdump';
 
-    $standardColors = ($fg=='ff0' && $bg=='333');
+   $standardColors = ($fg=='ff0' && $bg=='333');
+   
+   $yellow = 'ff0';
+   $orange = 'f80';
+   $gray   = '666';
+   $white  = 'fff';
+   $dkgray = '333';
+   $green  = '0f0';
+
+   if(!$standardColors)
+   {
+    $yellow = $fg;
+    $orange = $fg;
+    $gray   = $bg;
+    $white  = $fg;
+    $dkgray = $bg;
+   }
+
+   if($gray == $bg)
+   {
+    // functionality copied from Color.class -> compliment()
+    // originally found at http://serennu.com/colour/rgbtohsl.php
     
-    $yellow = 'ff0';
-    $orange = 'f80';
-    $gray   = '666';
-    $white  = 'fff';
-    $dkgray = '333';
-    $green  = '0f0';
+    $i = (strlen($gray)== 3)?1:2;
 
-    if(!$standardColors)
+    $redhex   = substr($gray,0,$i);
+    $greenhex = substr($gray,$i,$i);
+    $bluehex  = substr($gray,$i+2,$i);
+
+    $var_r = (hexdec($redhex)) / 255;
+    $var_g = (hexdec($greenhex)) / 255;
+    $var_b = (hexdec($bluehex)) / 255;
+
+    $var_min = min($var_r,$var_g,$var_b);
+    $var_max = max($var_r,$var_g,$var_b);
+    $del_max = $var_max - $var_min;
+
+    $l = ($var_max + $var_min) / 2;
+
+    if ($del_max == 0)
     {
-     $yellow = $fg;
-     $orange = $fg;
-     $gray   = $bg;
-     $white  = $fg;
-     $dkgray = $bg;
+     $h = 0;
+     $s = 0;
+    }
+    else
+    {
+     if ($l < 0.5)
+      $s = $del_max / ($var_max + $var_min);
+
+     else
+      $s = $del_max / (2 - $var_max - $var_min);
+
+     $del_r = ((($var_max - $var_r) / 6) + ($del_max / 2)) / $del_max;
+     $del_g = ((($var_max - $var_g) / 6) + ($del_max / 2)) / $del_max;
+     $del_b = ((($var_max - $var_b) / 6) + ($del_max / 2)) / $del_max;
+
+     if ($var_r == $var_max)
+      $h = $del_b - $del_g;
+
+     elseif ($var_g == $var_max)
+      $h = (1 / 3) + $del_r - $del_b;
+
+     elseif ($var_b == $var_max)
+      $h = (2 / 3) + $del_g - $del_r;
+
+    
+     if ($h < 0)
+      $h += 1;
+
+     if ($h > 1)
+      $h -= 1;
     }
 
-    if($gray == $bg)
+    $h2 = $h + 0.5;
+
+    if ($h2 > 1)
+     $h2 -= 1;
+
+    if ($s == 0)
     {
-     // functionality copied from Color.class -> compliment()
-     // originally found at http://serennu.com/colour/rgbtohsl.php
-     
-     $i = (strlen($gray)== 3)?1:2;
-
-     $redhex   = substr($gray,0,$i);
-     $greenhex = substr($gray,$i,$i);
-     $bluehex  = substr($gray,$i+2,$i);
-
-     $var_r = (hexdec($redhex)) / 255;
-     $var_g = (hexdec($greenhex)) / 255;
-     $var_b = (hexdec($bluehex)) / 255;
-
-     $var_min = min($var_r,$var_g,$var_b);
-     $var_max = max($var_r,$var_g,$var_b);
-     $del_max = $var_max - $var_min;
-
-     $l = ($var_max + $var_min) / 2;
-
-     if ($del_max == 0)
-     {
-      $h = 0;
-      $s = 0;
-     }
-     else
-     {
-      if ($l < 0.5)
-       $s = $del_max / ($var_max + $var_min);
-
-      else
-       $s = $del_max / (2 - $var_max - $var_min);
-
-      $del_r = ((($var_max - $var_r) / 6) + ($del_max / 2)) / $del_max;
-      $del_g = ((($var_max - $var_g) / 6) + ($del_max / 2)) / $del_max;
-      $del_b = ((($var_max - $var_b) / 6) + ($del_max / 2)) / $del_max;
-
-      if ($var_r == $var_max)
-       $h = $del_b - $del_g;
-
-      elseif ($var_g == $var_max)
-       $h = (1 / 3) + $del_r - $del_b;
-
-      elseif ($var_b == $var_max)
-       $h = (2 / 3) + $del_g - $del_r;
-
-     
-      if ($h < 0)
-       $h += 1;
-
-      if ($h > 1)
-       $h -= 1;
-     }
-
-     $h2 = $h + 0.5;
-
-     if ($h2 > 1)
-      $h2 -= 1;
-
-     if ($s == 0)
-     {
-      $r = $l * 255;
-      $g = $l * 255;
-      $b = $l * 255;
-     }
-     else
-     {
-      if ($l < 0.5)
-       $var_2 = $l * (1 + $s);
-  
-      else
-       $var_2 = ($l + $s) - ($s * $l);
-  
-      $var_1 = 2 * $l - $var_2;
-      $r = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 + (1 / 3));
-      $g = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2);
-      $b = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 - (1 / 3));
-     };
-
-
-     $rhex = sprintf("%02X",round($r));
-     $ghex = sprintf("%02X",round($g));
-     $bhex = sprintf("%02X",round($b));
-     $rgbhex = $rhex.$ghex.$bhex;
-
-     $gray = $rgbhex;
+     $r = $l * 255;
+     $g = $l * 255;
+     $b = $l * 255;
     }
+    else
+    {
+     if ($l < 0.5)
+      $var_2 = $l * (1 + $s);
+  
+     else
+      $var_2 = ($l + $s) - ($s * $l);
+  
+     $var_1 = 2 * $l - $var_2;
+     $r = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 + (1 / 3));
+     $g = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2);
+     $b = 255 * $this -> hue_2_rgb($var_1,$var_2,$h2 - (1 / 3));
+    };
 
-    $template = "
+
+    $rhex = sprintf("%02X",round($r));
+    $ghex = sprintf("%02X",round($g));
+    $bhex = sprintf("%02X",round($b));
+    $rgbhex = $rhex.$ghex.$bhex;
+
+    $gray = $rgbhex;
+   }
+
+   $template = "
  <div id=\"phpdump\" style=\"color: #{fore};
       background-color: #{back};
       text-align: left\"
@@ -173,119 +183,118 @@
  </div><!-- end phpdump -->\n\n
 ";
 
-    $tArg = null;
+   $tArg = null;
 
-    if(!is_numeric($arg))
+   if(!is_numeric($arg))
+   {
+    if(is_bool($arg) === true)
     {
-     if(is_bool($arg) === true)
-     {
-      $t = ($arg)?'true':'false';
-      $tArg = $t;
-     }
-     else if(is_null($arg))
-     {
-      $tArg = 'null';
-     }
-     else if($arg == '')
-     {
-      $tArg = '{empty string}';
-     }
-     else if($escape)
-     {
-      $arg = htmlentities(print_r($arg,true));
-     }
+     $t = ($arg)?'true':'false';
+     $tArg = $t;
     }
-
-    if(!is_null($tArg))
+    else if(is_null($arg))
     {
-     $arg = '(<span style="color:#' .$gray. '">' .$tArg. '</span>)';
+     $tArg = 'null';
     }
-
-    $trace = array_reverse(debug_backtrace(),true);
-     
-    $index    = (count($trace) > 1 && ($trace[1]['function'] == 'debug' || $trace[1]['function'] == 'pd'))?1:0;
-    $fullPath = str_replace('\\','/',$trace[$index]['file']);
-    $callers  = explode('/',$fullPath);
-    $caller   = end($callers);
-
-    $path   = null;
-    $trak   = null;
-    $delim = '<span style="color:#0f0"> &raquo; </span>';
-
-    $skippedFiles = array();
-    $skippedFiles[] = 'require';
-    $skippedFiles[] = 'phpdump';
-    $skippedFiles[] = 'debug';
-    $skippedFiles[] = 'include';
-
-
-    $newTrak = '<div style="display:inline">';
-
-    foreach($trace as $t => $info)
+    else if($arg == '')
     {
-     $function = strToLower($info['function']);
+     $tArg = '{empty string}';
+    }
+    else if($escape)
+    {
+     $arg = htmlentities(print_r($arg,true));
+    }
+   }
 
-     if(isset($info['file']))
+   if(!is_null($tArg))
+   {
+    $arg = '(<span style="color:#' .$gray. '">' .$tArg. '</span>)';
+   }
+
+   $trace = array_reverse(debug_backtrace(),true);
+    
+   $index    = (count($trace) > 1 && ($trace[1]['function'] == 'debug' || $trace[1]['function'] == 'pd'))?1:0;
+   $fullPath = str_replace('\\','/',$trace[$index]['file']);
+   $callers  = explode('/',$fullPath);
+   $caller   = end($callers);
+
+   $path   = null;
+   $trak   = null;
+   $delim = '<span style="color:#0f0"> &raquo; </span>';
+
+   $skippedFiles = array();
+   $skippedFiles[] = 'require';
+   $skippedFiles[] = 'phpdump';
+   $skippedFiles[] = 'debug';
+   $skippedFiles[] = 'include';
+
+
+   $newTrak = '<div style="display:inline">';
+
+   foreach($trace as $t => $info)
+   {
+    $function = strToLower($info['function']);
+
+    if(isset($info['file']))
+    {
+     $tempPath = str_replace('\\','/',$info['file']);
+      
+     $paths = explode('/',$tempPath);
+     $file = end($paths);
+      
+      
+     if($t == 0)
      {
-      $tempPath = str_replace('\\','/',$info['file']);
-       
-      $paths = explode('/',$tempPath);
-      $file = end($paths);
-       
-       
-      if($t == 0)
+      $newTrak .= '<span style="color:#e55">'.$function.$space.'()</span>';
+     }
+     else
+     {
+      $newTrak .= $file.' [<span style="color:#ee5">~line: ' .$info['line']. '</span>]</div>'."\n\n";
+      
+      if($function == 'dump')
       {
-       $newTrak .= '<span style="color:#e55">'.$function.SPACE.'()</span>';
+       $newTrak .= '<div style="padding-left:68px">&raquo; <span style="color:#e55">function</span> '.get_class($info['object']).'::'.$function.'()'.$space;
+       $index = $t;
+       $caller = $file;
       }
       else
       {
-       $newTrak .= $file.' [<span style="color:#ee5">~line: ' .$info['line']. '</span>]</div>'."\n\n";
-       
-       if($function == 'dump')
-       {
-        $newTrak .= '<div style="padding-left:68px">&raquo; <span style="color:#e55">function</span> '.get_class($info['object']).'::'.$function.'()'.SPACE;
-        $index = $t;
-        $caller = $file;
-       }
-       else
-       {
-        $newTrak .= '<div style="padding-left:68px">&raquo; ';
+       $newTrak .= '<div style="padding-left:68px">&raquo; ';
 
-        if($t > 1)
-        {
-         $newTrak .= '<span style="color:#55e">'.$function.SPACE.'</span>';
-        }
+       if($t > 1)
+       {
+        $newTrak .= '<span style="color:#55e">'.$function.$space.'</span>';
        }
       }
      }
-
-     if(!in_array($function,$skippedFiles) || ($function == 'debug' && is_null($path)))
-     {
-      $path .= $delim .$function.'()';
-     }
     }
 
-    $newTrak .= '</div>';
-     
+    if(!in_array($function,$skippedFiles) || ($function == 'debug' && is_null($path)))
+    {
+     $path .= $delim .$function.'()';
+    }
+   }
 
-    // colorcode the argument
-    $pattern[0] = '/\[(.*)\]/';
-    $pattern[1] = '/\=\&gt;(.*)/';
+   $newTrak .= '</div>';
+    
 
-    $replace[0] = '[<span style="color:#' .$yellow. '">\\1</span>]';
-    $replace[1] = '=&gt; <span style="color:#' .$orange. '">\\1</span>';
-    $arg = preg_replace($pattern,$replace,$arg);
+   // colorcode the argument
+   $pattern[0] = '/\[(.*)\]/';
+   $pattern[1] = '/\=\&gt;(.*)/';
 
+   $replace[0] = '[<span style="color:#' .$yellow. '">\\1</span>]';
+   $replace[1] = '=&gt; <span style="color:#' .$orange. '">\\1</span>';
+   $arg = preg_replace($pattern,$replace,$arg);
 
-    $dump = str_replace('{fore}',$fg,$template);
-    $dump = str_replace('{back}',$bg,$dump);
-    $dump = str_replace('{text}',$arg,$dump);
-    $dump = str_replace('{file}',$caller,$dump);
-    $dump = str_replace('{path}',$path,$dump);
-    $dump = str_replace('{trak}',$trak,$dump);
-    $dump = str_replace('{newtrak}',$newTrak,$dump);      
-    $dump = str_replace('{line}',$trace[$index]['line'],$dump);
+   $dump = str_replace('{fore}',$fg,$template);
+   $dump = str_replace('{back}',$bg,$dump);
+   $dump = str_replace('{text}',$arg,$dump);
+   $dump = str_replace('{file}',$caller,$dump);
+   $dump = str_replace('{path}',$path,$dump);
+   $dump = str_replace('{trak}',$trak,$dump);
+   $dump = str_replace('{newtrak}',$newTrak,$dump);      
+   $dump = str_replace('{line}',$trace[$index]['line'],$dump);
 
-    echo $dump;
-  }
+   echo $dump;
+  } // end function
 ?>
